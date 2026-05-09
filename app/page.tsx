@@ -9,6 +9,7 @@ export default function Home() {
   const [parties, setParties] = useState("");
   const [clauses, setClauses] = useState("");
   const [output, setOutput] = useState("");
+  const [activeTab, setActiveTab] = useState("contract")
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [templateText, setTemplateText] = useState("")
@@ -120,6 +121,16 @@ Generate:
         <nav className="space-y-4">
           <div className="bg-gray-800 p-3 rounded-lg">
             Contract Drafting
+          </div>
+
+          <div
+            onClick={() => setActiveTab("redline")}
+            className={`p-3 rounded-lg cursor-pointer ${activeTab === "redline"
+                ? "bg-gray-800"
+                : "hover:bg-gray-800"
+              }`}
+          >
+            Redlining
           </div>
 
           <div className="hover:bg-gray-800 p-3 rounded-lg">
