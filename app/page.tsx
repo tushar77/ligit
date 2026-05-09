@@ -1,3 +1,4 @@
+import Link from "next/link"
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -106,7 +107,15 @@ Generate:
   return (
     <div className="flex min-h-screen bg-gray-100">
       <aside className="w-64 bg-black text-white p-6 hidden md:block">
-        <h1 className="text-3xl font-bold mb-10">LIGIT</h1>
+        <Link href="/">
+          <div className="flex justify-center cursor-pointer">
+            <img
+              src="/ligit-logo.png"
+              alt="LIGIT Logo"
+              className="w-40 object-contain"
+            />
+          </div>
+        </Link>
 
         <nav className="space-y-4">
           <div className="bg-gray-800 p-3 rounded-lg">
