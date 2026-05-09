@@ -10,6 +10,8 @@ export default function Home() {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [templateText, setTemplateText] = useState("")
+  const [templateName, setTemplateName] = useState("")
   const copiedTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -67,30 +69,39 @@ Generate:
   };
 
   const copyGeneratedOutput = async () => {
-    if (!output) return;
+    if (!output) return
 
     try {
-      await navigator.clipboard.writeText(output);
-    } catch {
-      const el = document.createElement("textarea");
-      el.value = output;
-      el.setAttribute("readonly", "");
-      el.style.position = "fixed";
-      el.style.top = "-9999px";
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
+      await navigator.clipboard.writeText(output)
+
+      setCopied(true)
+
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    } catch (err) {
+      console.error("Failed to copy:", err)
+    }
+  }
+
+  const handleTemplateUpload = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0]
+
+    if (!file) return
+
+    setTemplateName(file.name)
+
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      const text = e.target?.result as string
+      setTemplateText(text)
     }
 
-    setCopied(true);
-    if (copiedTimeoutRef.current !== null) {
-      window.clearTimeout(copiedTimeoutRef.current);
-    }
-    copiedTimeoutRef.current = window.setTimeout(() => {
-      setCopied(false);
-    }, 2000);
-  };
+    reader.readAsText(file)
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -156,12 +167,31 @@ Generate:
                 onChange={(e) => setClauses(e.target.value)}
               />
 
-              <button
-                onClick={generateContract}
-                className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800"
-              >
-                {loading ? "Generating..." : "Generate Contract"}
-              </button>
+              <div className="flex gap-4 items-center flex-wrap">
+                <button
+                  onClick={generateContract}
+                  className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800"
+                >
+                  {loading ? "Generating..." : "Generate Contract"}
+                </button>
+
+                <label className="bg-gray-200 px-4 py-3 rounded-xl cursor-pointer hover:bg-gray-300">
+                  Upload Template
+                  <input
+                    type="file"
+                    accept=".txt"
+                    onChange={handleTemplateUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {templateName && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Template uploaded: {templateName}
+                </p>
+              )}
+
             </div>
           </div>
 
