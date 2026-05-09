@@ -1,7 +1,7 @@
-import Link from "next/link"
 "use client";
+import Link from "next/link"
 
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Copy } from "lucide-react";
 
 export default function Home() {
