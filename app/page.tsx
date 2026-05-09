@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Copy } from "lucide-react";
 
 export default function Home() {
   const [contractType, setContractType] = useState("");
@@ -8,6 +9,16 @@ export default function Home() {
   const [clauses, setClauses] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const copiedTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current !== null) {
+        window.clearTimeout(copiedTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const generateContract = async () => {
     setLoading(true);
@@ -48,11 +59,37 @@ Generate:
       const data = await response.json();
 
       setOutput(data.result);
-    } catch (error) {
+    } catch {
       setOutput("Something went wrong.");
     }
 
     setLoading(false);
+  };
+
+  const copyGeneratedOutput = async () => {
+    if (!output) return;
+
+    try {
+      await navigator.clipboard.writeText(output);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = output;
+      el.setAttribute("readonly", "");
+      el.style.position = "fixed";
+      el.style.top = "-9999px";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+
+    setCopied(true);
+    if (copiedTimeoutRef.current !== null) {
+      window.clearTimeout(copiedTimeoutRef.current);
+    }
+    copiedTimeoutRef.current = window.setTimeout(() => {
+      setCopied(false);
+    }, 2000);
   };
 
   return (
@@ -129,9 +166,23 @@ Generate:
           </div>
 
           <div className="bg-white rounded-2xl shadow-md p-6">
-            <h3 className="text-2xl font-semibold mb-4">
-              Generated Output
-            </h3>
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <h3 className="text-2xl font-semibold">Generated Output</h3>
+
+              <button
+                type="button"
+                onClick={copyGeneratedOutput}
+                disabled={!output}
+                aria-label={output ? "Copy generated output" : "No output to copy"}
+                className="shrink-0 inline-flex items-center justify-center rounded-lg border bg-white px-2.5 py-2 text-sm text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {copied ? (
+                  <span className="font-medium">Copied!</span>
+                ) : (
+                  <Copy className="h-4 w-4" aria-hidden="true" />
+                )}
+              </button>
+            </div>
 
             <div className="border rounded-xl p-4 h-[500px] overflow-y-auto bg-gray-50 whitespace-pre-wrap">
               {output || "AI-generated legal document will appear here..."}
