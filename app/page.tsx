@@ -119,15 +119,21 @@ Generate:
         </Link>
 
         <nav className="space-y-4">
-          <div className="bg-gray-800 p-3 rounded-lg">
+          <div
+            onClick={() => setActiveTab("contract")}
+            className={`p-3 rounded-lg cursor-pointer ${activeTab === "contract"
+              ? "bg-gray-800"
+              : "hover:bg-gray-800"
+              }`}
+          >
             Contract Drafting
           </div>
 
           <div
             onClick={() => setActiveTab("redline")}
             className={`p-3 rounded-lg cursor-pointer ${activeTab === "redline"
-                ? "bg-gray-800"
-                : "hover:bg-gray-800"
+              ? "bg-gray-800"
+              : "hover:bg-gray-800"
               }`}
           >
             Redlining
@@ -159,88 +165,165 @@ Generate:
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <h3 className="text-2xl font-semibold mb-4">
-              Contract Drafting
-            </h3>
+        {activeTab === "contract" && (
 
-            <div className="space-y-4">
-              <input
-                className="w-full border rounded-lg p-3"
-                placeholder="Contract Type"
-                value={contractType}
-                onChange={(e) => setContractType(e.target.value)}
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <h3 className="text-2xl font-semibold mb-4">
+                Contract Drafting
+              </h3>
 
-              <input
-                className="w-full border rounded-lg p-3"
-                placeholder="Parties Involved"
-                value={parties}
-                onChange={(e) => setParties(e.target.value)}
-              />
+              <div className="space-y-4">
+                <input
+                  className="w-full border rounded-lg p-3"
+                  placeholder="Contract Type"
+                  value={contractType}
+                  onChange={(e) => setContractType(e.target.value)}
+                />
 
-              <textarea
-                className="w-full border rounded-lg p-3 h-40"
-                placeholder="Special Clauses / Requirements"
-                value={clauses}
-                onChange={(e) => setClauses(e.target.value)}
-              />
+                <input
+                  className="w-full border rounded-lg p-3"
+                  placeholder="Parties Involved"
+                  value={parties}
+                  onChange={(e) => setParties(e.target.value)}
+                />
 
-              <div className="flex gap-4 items-center flex-wrap">
+                <textarea
+                  className="w-full border rounded-lg p-3 h-40"
+                  placeholder="Special Clauses / Requirements"
+                  value={clauses}
+                  onChange={(e) => setClauses(e.target.value)}
+                />
+
+                <div className="flex gap-4 items-center flex-wrap">
+                  <button
+                    onClick={generateContract}
+                    className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800"
+                  >
+                    {loading ? "Generating..." : "Generate Contract"}
+                  </button>
+
+                  <label className="bg-gray-200 px-4 py-3 rounded-xl cursor-pointer hover:bg-gray-300">
+                    Upload Template
+                    <input
+                      type="file"
+                      accept=".txt"
+                      onChange={handleTemplateUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+
+                {templateName && (
+                  <p className="text-sm text-gray-600 mt-2">
+                    Template uploaded: {templateName}
+                  </p>
+                )}
+
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="flex items-start justify-between gap-3 mb-4">
+                <h3 className="text-2xl font-semibold">Generated Output</h3>
+
                 <button
-                  onClick={generateContract}
-                  className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800"
+                  type="button"
+                  onClick={copyGeneratedOutput}
+                  disabled={!output}
+                  aria-label={output ? "Copy generated output" : "No output to copy"}
+                  className="shrink-0 inline-flex items-center justify-center rounded-lg border bg-white px-2.5 py-2 text-sm text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? "Generating..." : "Generate Contract"}
+                  {copied ? (
+                    <span className="font-medium">Copied!</span>
+                  ) : (
+                    <Copy className="h-4 w-4" aria-hidden="true" />
+                  )}
                 </button>
-
-                <label className="bg-gray-200 px-4 py-3 rounded-xl cursor-pointer hover:bg-gray-300">
-                  Upload Template
-                  <input
-                    type="file"
-                    accept=".txt"
-                    onChange={handleTemplateUpload}
-                    className="hidden"
-                  />
-                </label>
               </div>
 
-              {templateName && (
-                <p className="text-sm text-gray-600 mt-2">
-                  Template uploaded: {templateName}
-                </p>
-              )}
+              <div className="h-[500px] overflow-y-auto rounded-xl border bg-white p-6 shadow-sm">
+                <pre className="whitespace-pre-wrap font-serif text-[15px] leading-8 text-gray-900">
+                  {output || "AI-generated legal document will appear here..."}
+                </pre>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "redline" && (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-4xl font-bold text-gray-900">
+                AI Contract Redlining
+              </h2>
+
+              <p className="text-gray-600 mt-2">
+                Upload original and reviewed contracts to identify key changes.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              <div className="bg-white rounded-2xl shadow-md p-6">
+
+                <h3 className="text-2xl font-semibold mb-6">
+                  Upload Contracts
+                </h3>
+
+                <div className="space-y-6">
+
+                  <div>
+                    <label className="block mb-2 font-medium">
+                      Original Contract
+                    </label>
+
+                    <input
+                      type="file"
+                      accept=".txt"
+                      className="w-full border rounded-lg p-3"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 font-medium">
+                      Reviewed Contract
+                    </label>
+
+                    <input
+                      type="file"
+                      accept=".txt"
+                      className="w-full border rounded-lg p-3"
+                    />
+                  </div>
+
+                  <button
+                    className="bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-800"
+                  >
+                    Compare Contracts
+                  </button>
+
+                </div>
+
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-md p-6">
+
+                <h3 className="text-2xl font-semibold mb-6">
+                  Redlining Summary
+                </h3>
+
+                <div className="border rounded-xl p-4 h-[500px] overflow-y-auto whitespace-pre-wrap leading-7">
+
+                  AI-generated contract comparison will appear here...
+
+                </div>
+
+              </div>
 
             </div>
           </div>
-
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <div className="flex items-start justify-between gap-3 mb-4">
-              <h3 className="text-2xl font-semibold">Generated Output</h3>
-
-              <button
-                type="button"
-                onClick={copyGeneratedOutput}
-                disabled={!output}
-                aria-label={output ? "Copy generated output" : "No output to copy"}
-                className="shrink-0 inline-flex items-center justify-center rounded-lg border bg-white px-2.5 py-2 text-sm text-gray-900 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {copied ? (
-                  <span className="font-medium">Copied!</span>
-                ) : (
-                  <Copy className="h-4 w-4" aria-hidden="true" />
-                )}
-              </button>
-            </div>
-
-            <div className="h-[500px] overflow-y-auto rounded-xl border bg-white p-6 shadow-sm">
-              <pre className="whitespace-pre-wrap font-serif text-[15px] leading-8 text-gray-900">
-                {output || "AI-generated legal document will appear here..."}
-              </pre>
-            </div>
-          </div>
-        </div>
+        )}
       </main>
     </div>
   );
