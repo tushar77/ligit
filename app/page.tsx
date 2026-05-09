@@ -214,8 +214,10 @@ Generate:
               </button>
             </div>
 
-            <div className="border rounded-xl p-4 h-[500px] overflow-y-auto bg-gray-50 whitespace-pre-wrap">
-              {output || "AI-generated legal document will appear here..."}
+            <div className="h-[500px] overflow-y-auto rounded-xl border bg-white p-6 shadow-sm">
+              <pre className="whitespace-pre-wrap font-serif text-[15px] leading-8 text-gray-900">
+                {output || "AI-generated legal document will appear here..."}
+              </pre>
             </div>
           </div>
         </div>
